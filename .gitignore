@@ -1,21 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
 # Virtual environment
 .venv/
+venv/
 
 # Environment variables
 .env
 
-# Python cache
-__pycache__/
-*.pyc
-
-# Audio files
-*.wav
-
-# Vector database
+# Vector DB
 vector_db/
 
 # Downloads
+downloads/
 downloades/
 
-# MacOS
+# OS files
 .DS_Store
