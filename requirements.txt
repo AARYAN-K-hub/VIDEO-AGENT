@@ -85,3 +85,4 @@ sentence-transformers>=3.0.0      # Local HuggingFace embeddings
 numpy>=1.26.0
 requests>=2.31.0
 tqdm>=4.66.0
+langchain-chroma
