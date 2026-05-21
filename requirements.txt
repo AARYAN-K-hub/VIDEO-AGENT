@@ -1,0 +1,87 @@
+# ─────────────────────────────────────────────
+# AI Meeting Assistant — requirements.txt
+# Python >= 3.10 recommended
+# ─────────────────────────────────────────────
+
+
+# ── Audio Acquisition ──────────────────────────────────────────────────────────
+yt-dlp>=2024.4.9               # Download audio from YouTube URLs
+pydub>=0.25.1                  # Audio file manipulation & format conversion
+ffmpeg-python>=0.2.0           # FFmpeg bindings (ffmpeg binary must be installed separately)
+
+
+# ── Transcription (local Whisper) ─────────────────────────────────────────────
+openai-whisper>=20240930       # Local Whisper ASR model
+torch>=2.2.0                   # Required backend for Whisper
+torchaudio>=2.2.0              # Audio tensor utilities used by Whisper
+numpy>=1.26.0                  # Numerical operations
+
+
+# ── Translation (Hindi → English) ─────────────────────────────────────────────
+deep-translator>=1.11.4        # Lightweight translation wrapper (Google Translate backend)
+
+
+# ── LangChain LCEL + Mistral ──────────────────────────────────────────────────
+langchain>=0.2.0               # Core LangChain framework & LCEL
+langchain-core>=0.2.0          # Runnables, prompts, output parsers
+langchain-community>=0.2.0     # Community integrations (loaders, vectorstores, etc.)
+langchain-mistralai>=0.1.0     # Official Mistral AI chat model integration
+mistralai>=0.4.0               # Mistral Python SDK (used by langchain-mistralai)
+
+
+# ── RAG Pipeline ──────────────────────────────────────────────────────────────
+chromadb>=0.5.0                # Local vector store for transcript embeddings
+sentence-transformers>=3.0.0   # HuggingFace embedding models (e.g. all-MiniLM-L6-v2)
+langchain-huggingface>=0.0.3   # HuggingFaceEmbeddings wrapper for LangChain
+huggingface-hub>=0.23.0        # Model downloading & Hub API
+
+
+# ── Streamlit UI ──────────────────────────────────────────────────────────────
+streamlit>=1.35.0              # Web UI framework
+
+
+# ── Export (PDF & TXT) ────────────────────────────────────────────────────────
+reportlab>=4.2.0               # PDF generation for export
+
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0           # Load API keys from .env file
+tqdm>=4.66.0                   # Progress bars
+tiktoken>=0.7.0                # Token counting (used internally by LangChain)
+
+# ── Web UI ──────────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+
+# ── Environment ─────────────────────────────────────────────────────────────
+python-dotenv>=1.0.0
+
+# ── Audio / Video processing ─────────────────────────────────────────────────
+yt-dlp>=2024.4.9                  # YouTube download
+pydub>=0.25.1                     # Audio chunking & conversion
+ffmpeg-python>=0.2.0              # FFmpeg bindings (requires ffmpeg installed)
+
+# ── Transcription ────────────────────────────────────────────────────────────
+openai-whisper>=20231117          # Local Whisper transcription
+# -- OR use the OpenAI API instead:
+# openai>=1.30.0
+
+# ── LLM / Summarisation / Extraction ────────────────────────────────────────
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-openai>=0.1.0           # If using OpenAI models
+# langchain-google-genai>=1.0.0   # Uncomment if using Gemini
+# langchain-anthropic>=0.1.0      # Uncomment if using Claude
+
+# ── RAG / Vector store ───────────────────────────────────────────────────────
+faiss-cpu>=1.8.0                  # Local vector search (use faiss-gpu if CUDA available)
+# chromadb>=0.5.0                 # Alternative: ChromaDB vector store
+tiktoken>=0.7.0                   # Token counting for OpenAI models
+
+# ── Embeddings ───────────────────────────────────────────────────────────────
+sentence-transformers>=3.0.0      # Local HuggingFace embeddings
+# -- OR rely on OpenAIEmbeddings via langchain-openai (no extra package needed)
+
+# ── Utilities ────────────────────────────────────────────────────────────────
+numpy>=1.26.0
+requests>=2.31.0
+tqdm>=4.66.0
