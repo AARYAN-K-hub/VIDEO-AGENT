@@ -1,5 +1,6 @@
 import os
 import yt_dlp
+
 from pydub import AudioSegment
 
 DOWNLOAD_DIR = "downloads"
@@ -11,38 +12,29 @@ os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 # ─────────────────────────────────────────────
 def download_youtube_audio(url: str) -> str:
 
-    output_path = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
+    output_path = os.path.join(
+        DOWNLOAD_DIR,
+        "%(title)s.%(ext)s"
+    )
 
     ydl_opts = {
-        # Better audio selection
-        "format": "bestaudio[ext=m4a]/bestaudio/best",
-
-        # Save location
+        "format": "bestaudio/best",
         "outtmpl": output_path,
 
-        # Prevent many YouTube blocks
-        "quiet": False,
+        # Better compatibility
         "noplaylist": True,
-        "geo_bypass": True,
+        "quiet": True,
         "nocheckcertificate": True,
+        "ignoreerrors": False,
 
-        # Browser impersonation
-        "http_headers": {
-            "User-Agent": (
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/124.0.0.0 Safari/537.36"
-            )
-        },
-
-        # Better extraction for cloud deployments
+        # Prevent bot blocking
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "web"]
+                "player_client": ["android"]
             }
         },
 
-        # Convert audio to WAV
+        # Convert to wav automatically
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
@@ -63,7 +55,7 @@ def download_youtube_audio(url: str) -> str:
             wav_file = base + ".wav"
 
             if not os.path.exists(wav_file):
-                raise Exception("WAV conversion failed")
+                raise Exception("WAV conversion failed.")
 
             return wav_file
 
@@ -72,19 +64,19 @@ def download_youtube_audio(url: str) -> str:
 
 
 # ─────────────────────────────────────────────
-# Convert Local File to WAV
+# Convert Local File To WAV
 # ─────────────────────────────────────────────
 def convert_to_wav(input_path: str) -> str:
 
-    if not os.path.exists(input_path):
-        raise FileNotFoundError(f"File not found: {input_path}")
-
-    output_path = os.path.splitext(input_path)[0] + "_converted.wav"
-
     try:
+        output_path = (
+            os.path.splitext(input_path)[0]
+            + "_converted.wav"
+        )
+
         audio = AudioSegment.from_file(input_path)
 
-        # Mono + 16kHz for Whisper
+        # Whisper-friendly format
         audio = audio.set_channels(1)
         audio = audio.set_frame_rate(16000)
 
@@ -99,32 +91,40 @@ def convert_to_wav(input_path: str) -> str:
 # ─────────────────────────────────────────────
 # Chunk Audio
 # ─────────────────────────────────────────────
-def chunk_audio(wav_path: str, chunk_minutes: int = 10) -> list:
+def chunk_audio(
+    wav_path: str,
+    chunk_minutes: int = 10
+) -> list:
 
-    if not os.path.exists(wav_path):
-        raise FileNotFoundError(f"WAV file not found: {wav_path}")
+    try:
+        audio = AudioSegment.from_wav(wav_path)
 
-    audio = AudioSegment.from_wav(wav_path)
+        chunk_ms = chunk_minutes * 60 * 1000
 
-    chunk_ms = chunk_minutes * 60 * 1000
+        chunks = []
 
-    chunks = []
+        for i, start in enumerate(
+            range(0, len(audio), chunk_ms)
+        ):
 
-    for i, start in enumerate(range(0, len(audio), chunk_ms)):
+            chunk = audio[start:start + chunk_ms]
 
-        chunk = audio[start:start + chunk_ms]
+            chunk_path = (
+                f"{wav_path}_chunk_{i}.wav"
+            )
 
-        chunk_path = f"{wav_path}_chunk_{i}.wav"
+            chunk.export(chunk_path, format="wav")
 
-        chunk.export(chunk_path, format="wav")
+            chunks.append(chunk_path)
 
-        chunks.append(chunk_path)
+        return chunks
 
-    return chunks
+    except Exception as e:
+        raise Exception(f"Audio chunking failed: {str(e)}")
 
 
 # ─────────────────────────────────────────────
-# Main Input Processor
+# Main Processing Pipeline
 # ─────────────────────────────────────────────
 def process_input(source: str) -> list:
 
@@ -133,14 +133,14 @@ def process_input(source: str) -> list:
         # YouTube URL
         if source.startswith("http://") or source.startswith("https://"):
 
-            print("Detected YouTube URL. Downloading audio...")
+            print("Detected YouTube URL")
 
             wav_path = download_youtube_audio(source)
 
         # Local file
         else:
 
-            print("Detected local file. Converting to WAV...")
+            print("Detected local file")
 
             wav_path = convert_to_wav(source)
 
@@ -148,9 +148,14 @@ def process_input(source: str) -> list:
 
         chunks = chunk_audio(wav_path)
 
-        print(f"Audio ready — {len(chunks)} chunk(s) created.")
+        print(
+            f"Audio ready — {len(chunks)} chunk(s) created."
+        )
 
         return chunks
 
     except Exception as e:
-        raise Exception(f"Audio processing failed: {str(e)}")
+        raise Exception(
+            f"Audio processing failed: {str(e)}"
+        )
+        
